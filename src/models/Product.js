@@ -1,6 +1,6 @@
 import { observable, action, computed } from "mobx";
 import ProductService from 'services/product';
-import CategoryService from 'services/category';
+import Category from './Category';
 import { mixin } from 'utils/decorator';
 
 const StatusList = [{
@@ -9,9 +9,10 @@ const StatusList = [{
   text: '上架', value: 'online'
 }]
 
-@mixin(CategoryService)
 export default class Product extends ProductService {
   static StatusList = StatusList;
+
+  category = new Category();
 
   @observable id;// 商品 id
   @observable name;// 商品名称
@@ -22,6 +23,8 @@ export default class Product extends ProductService {
   @observable pic_url;// 图片
   @observable desc;// 描述
   @observable status;// 状态
+
+  @observable categories = [];// 商品分量全量信息
 
   constructor(props){
     super(props);
@@ -65,16 +68,28 @@ export default class Product extends ProductService {
     };
   }
 
+  // 备注，改变单个数组项的属性不会引起视图重绘，必须在数组中改变整个数组项
+  // 在 product 实例初始化过程中调用 getCategories 方法，不会引起 Table 视图的重绘
+  @action
+  getCategories(){
+    if ( !this.cids || !this.cids.length ) return;
+    this.categories = [];
+    this.cids.map(async cid => {
+      const res = await this.category.getCategory({cid});
+      this.categories.push(res[0]);
+    });
+  }
+
   // 获取商品分类文案
   @computed
   get categoryTexts(){
-    let text = '';
-    // ClassifyList.some(item => {
-    //   if ( item.value === this.classify ){
-    //     text = item.text;
-    //     return true;
-    //   };
-    // });
+    return this.categories.map(item => item.name).join(',');
+  }
+
+  // 获取商品状态文案
+  @computed
+  get statusText(){
+    let text = StatusList.filter(item => item.value === this.status)[0].text;
 
     return text;
   }

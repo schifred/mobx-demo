@@ -3,7 +3,21 @@ import { inject, observer } from "mobx-react";
 import { Table, Modal } from 'antd';
 import ProductForm from './ProductForm';
 
-@inject('products', 'category')
+// 远程获取的数组项数据需要重新设置观察者，以驱动视图更新
+@observer
+class CategoryText extends Component{
+  componentWillMount(){
+    const { product } = this.props;
+    product.getCategories();
+  }
+
+  render(){
+    const { product } = this.props;
+    return product.categoryTexts;
+  }
+};
+
+@inject('products')
 @observer
 export default class ProductList extends Component {
   state = {
@@ -21,9 +35,11 @@ export default class ProductList extends Component {
     key: 'name',
   }, {
     title: '分类',
-    dataIndex: 'classify',
-    key: 'classify',
-    render: (classify, product) => product.categoryTexts
+    dataIndex: 'categories',
+    key: 'categories',
+    render: (categories, product) => {
+      return <CategoryText product={product}/>
+    }
   }, {
     title: '价格',
     dataIndex: 'price',
@@ -32,6 +48,10 @@ export default class ProductList extends Component {
     title: '数量',
     dataIndex: 'num',
     key: 'num'
+  }, {
+    title: '状态',
+    dataIndex: 'statusText',
+    key: 'statusText'
   }, {
     title: '描述',
     dataIndex: 'desc',
@@ -49,7 +69,6 @@ export default class ProductList extends Component {
   }];
 
   componentWillMount(){
-    this.props.category.getCategory({ level: 1 });
     this.props.products.getProducts();
   }
 
@@ -84,7 +103,7 @@ export default class ProductList extends Component {
 
     return (
       <div>
-        <Table rowKey='id' columns={this.columns} dataSource={products.toJS()} />
+        <Table size="small" rowKey='id' columns={this.columns} dataSource={products.toJS()} />
         <Modal title="配置商品" visible={visible} onOk={this.saveProduct} onCancel={this.hideModel}>
           <ProductForm ref={c => { if ( c ) this.form = c }} dataSource={product} />
         </Modal>

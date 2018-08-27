@@ -1,16 +1,16 @@
-export function mixin(ClsWillMixin){
-  const protoWillMixin = ClsWillMixin.prototype;
-  const protoKeys = Object.getOwnPropertyNames(protoWillMixin);
-  const mixinKeys = protoKeys.filter(key => {
+export function mixin(MixinCls){
+  const mixinPrototype = MixinCls.prototype;
+  let mixinProperties = Object.getOwnPropertyNames(mixinPrototype);
+  mixinProperties = mixinProperties.filter(key => {
     return key !== 'constructor';
   });
 
   return function (Cls){
     const prototype = Cls.prototype;
 
-    mixinKeys.map(key => {
-      if ( !prototype[key] ) 
-        addHiddenProp(prototype, key, protoWillMixin[key]);
+    mixinProperties.map(propertyName => {
+      if ( !prototype[propertyName] ) 
+        addHiddenProp(prototype, propertyName, mixinPrototype[propertyName]);
     });
 
     return Cls;
