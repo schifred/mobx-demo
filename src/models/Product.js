@@ -1,6 +1,7 @@
 import { observable, action, computed } from "mobx";
 import ProductService from 'services/product';
 import Category from './Category';
+import Attribute from './Attribute';
 import { mixin } from 'utils/decorator';
 
 const StatusList = [{
@@ -17,7 +18,7 @@ export default class Product extends ProductService {
   @observable id;// 商品 id
   @observable name;// 商品名称
   @observable cids;// 商品分类
-  @observable attrs = [];// 商品属性
+  @observable attrs = new Attribute();// 商品属性
   @observable num;// 库存
   @observable price;// 价格
   @observable pic_url;// 图片
@@ -41,7 +42,7 @@ export default class Product extends ProductService {
       this.id = data.id;
       this.name = data.name;
       this.cids = data.cids;
-      this.attrs = data.attrs;
+      this.attrs = new Attribute(data.attrs);
       this.num = data.num;
       this.price = data.price;
       this.pic_url = data.pic_url;
@@ -84,6 +85,13 @@ export default class Product extends ProductService {
   @computed
   get categoryTexts(){
     return this.categories.map(item => item.name).join(',');
+  }
+
+  // 获取属性
+  @action
+  async getAttributes(cid){
+    const res = await this.attrs.getAttributes({ cid });
+    return res;
   }
 
   // 获取商品状态文案

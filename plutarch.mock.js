@@ -1,7 +1,7 @@
 const catrgories = [{
-  id: 0, name: '家电 / 数码 / 手机', value: 'electronic', level: 1
+  id: 0, name: '家电 - 数码 - 手机', value: 'electronic', level: 1
 },{
-  id: 1, name: '女装 / 男装 / 内衣', value: 'clothes', level: 1
+  id: 1, name: '女装 - 男装 - 内衣', value: 'clothes', level: 1
 },{
   id: 2, name: '手机', value: 'cellphone', parentId: 0, level: 2
 },{
@@ -33,7 +33,7 @@ module.exports = function(app){
   app.get('/api/attributes', (req, res) => {
     const { query: { cid } } = req;
 
-    if ( cid == 3 ){
+    if ( cid == 2 ){
       res.send({
         code: 200,
         success: true,
@@ -46,7 +46,7 @@ module.exports = function(app){
             name: '小米', value: 'MI', id: 302
           }]
         }, {
-          id: 0, name: '运行内存', order: 0, type: 'enum', values: [{
+          id: 1, name: '运行内存', order: 0, type: 'enum', values: [{
             name: '4GB', value: '4GB', id: 310
           }, {
             name: '6GB', value: '6GB', id: 311
@@ -55,12 +55,12 @@ module.exports = function(app){
           }]
         }]
       });
-    } else if ( cid == 4 ){
+    } else if ( cid == 3 ){
       res.send({
         code: 200,
         success: true,
         data: [{
-          id: 0, name: '季节', order: 0, type: 'enum', values: [{
+          id: 2, name: '季节', order: 0, type: 'enum', values: [{
             name: '春季', value: 'spring', id: 401
           }, {
             name: '夏季', value: 'summer', id: 401
