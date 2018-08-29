@@ -18,8 +18,11 @@ export async function del(url, params, opts){
 function stringify(params = {}){
   let query = [];
   Object.keys(params).map(key => {
-    let value = encodeURIComponent(params[key]);
-    if ( value !== undefined ) query.push(`${key}=${value}`);
+    let value = params[key];
+    if ( value !== undefined ){
+      value = encodeURIComponent();
+      query.push(`${key}=${value}`);
+    };
   });
 
   query = query.join('&');

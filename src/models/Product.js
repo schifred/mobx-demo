@@ -14,11 +14,11 @@ export default class Product extends ProductService {
   static StatusList = StatusList;
 
   category = new Category();
+  attribute = new Attribute();
 
-  @observable id;// 商品 id
   @observable name;// 商品名称
   @observable cids;// 商品分类
-  @observable attrs = new Attribute();// 商品属性
+  @observable attrValues = {};// 商品属性
   @observable num;// 库存
   @observable price;// 价格
   @observable pic_url;// 图片
@@ -39,10 +39,9 @@ export default class Product extends ProductService {
 
       if ( typeof name === 'string' ) this[name] = value;
     } else if ( typeof data === 'object' ){
-      this.id = data.id;
       this.name = data.name;
       this.cids = data.cids;
-      this.attrs = new Attribute(data.attrs);
+      this.attrValues = data.attrValues;
       this.num = data.num;
       this.price = data.price;
       this.pic_url = data.pic_url;
@@ -57,10 +56,9 @@ export default class Product extends ProductService {
 
   get(){
     return {
-      id: this.id,
       name: this.name,
       cids: this.cids,
-      attrs: this.attrs,
+      attrValues: this.attrValues,
       num: this.num,
       price: this.price,
       pic_url: this.pic_url,
@@ -90,7 +88,7 @@ export default class Product extends ProductService {
   // 获取属性
   @action
   async getAttributes(cid){
-    const res = await this.attrs.getAttributes({ cid });
+    const res = await this.attribute.getAttributes({ cid });
     return res;
   }
 
@@ -103,12 +101,12 @@ export default class Product extends ProductService {
   }
   
   @action
-  async getProduct(){
+  async getProduct(id){
     this.reset();
-    const res = await super.getProduct({ id: this.id });
+    const res = await super.getProduct({ id });
     const { data } = res || {};
     if ( data ) this.set(data);
-    return res;
+    return data || null;
   }
   
   @action
@@ -119,15 +117,15 @@ export default class Product extends ProductService {
   }
   
   @action
-  async updateProduct(){
+  async updateProduct(id){
     const params = this.get();
-    const res = await super.updateProduct(params);
+    const res = await super.updateProduct({ id, ...params });
     return res;
   }
   
   @action
-  async deleteProduct(){
-    const res = await super.deleteProduct({ id: this.id });
+  async deleteProduct(id){
+    const res = await super.deleteProduct({ id });
     const { data } = res || {};
     if ( data ) this.reset();
     return res;

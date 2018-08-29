@@ -15,7 +15,7 @@ render(
       <div>
         <Route path='/products' component={ProductList} />
         <Route path='/create' component={Product} />
-        <Route path='/edit' component={Product} />
+        <Route path='/edit/:id' component={Product} />
       </div>
     </Router>
   </Provider>,

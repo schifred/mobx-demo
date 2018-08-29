@@ -1,6 +1,7 @@
 import React, { Component } from "react";
+import { withRouter } from "react-router";
 import { inject, observer } from "mobx-react";
-import { Form, Input, Cascader, Select } from 'antd';
+import { Form, Input, Cascader, Select, Button } from 'antd';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -13,6 +14,18 @@ const formItemLayout = {
   wrapperCol: {
     xs: { span: 24 },
     sm: { span: 8 },
+  },
+};
+const tailFormItemLayout = {
+  wrapperCol: {
+    xs: {
+      span: 24,
+      offset: 0,
+    },
+    sm: {
+      span: 8,
+      offset: 4,
+    },
   },
 };
 
@@ -36,19 +49,48 @@ class CategoryCascader extends Component{
   }
 };
 
+// @withRouter
 @inject('product', 'category')
 @observer
-class ProductForm extends Component {
+class CreateProduct extends Component {
   componentDidMount(){
-    const { product } = this.props;
-    product.getProduct();
-    // form.setFieldsValue(dataSource.get());
+    const { product, form, match: { params: { id } } } = this.props;
+    if ( id !== undefined ) 
+      product.getProduct(id).then(res => {
+        form.setFieldsValue(res);
+      });
   }
 
+  // 分类属性变更
   handleCategoryChange = value => {
     const { product } = this.props;
     const len = value.length;
     if ( len == 2 ) product.getAttributes(value[len - 1]);
+  }
+
+  // 提交数据
+  onSubmit = () => {
+    const { product, form, match: { params: { id } } } = this.props;
+
+    form.validateFields((errs, vals) => {
+      console.log(vals)
+      if ( errs ) return;
+
+      let attrValues = {};
+      const { attrs, ...rest } = vals;
+      Object.keys(attrs).map(key => {
+        attrValues[key.slice(6)] = attrs[key];
+      });
+
+      // 将数据存入 store，准备提交
+      product.set({
+        ...rest,
+        attrValues: attrValues
+      });
+
+      if ( id !== undefined ) product.saveProduct();
+      else product.updateProduct(id);
+    })
   }
 
   render(){
@@ -66,7 +108,7 @@ class ProductForm extends Component {
         </FormItem>
 
         <FormItem {...formItemLayout} label="商品分类">
-          {getFieldDecorator('classify', {
+          {getFieldDecorator('cids', {
             rules: [{ required: true, message: '请选择商品分类！' }],
           })(
             <CategoryCascader placeholder="请选择商品分类" onChange={this.handleCategoryChange} />
@@ -74,10 +116,10 @@ class ProductForm extends Component {
         </FormItem>
 
         {
-          product.attrs.attributes.map(attr => {
+          product.attribute.attributes.map(attr => {
             return (
               <FormItem {...formItemLayout} label={attr.name} key={attr.id}>
-                {getFieldDecorator(`attrs.${attr.id}`, {
+                {getFieldDecorator(`attrs.attrId${attr.id}`, {
                   rules: [{ required: true, message: `请选择${attr.name}！` }],
                 })(
                   <Select mode="multiple" placeholder={`请选择${attr.name}！`}>
@@ -95,7 +137,11 @@ class ProductForm extends Component {
 
         <FormItem {...formItemLayout} label="商品单价">
           {getFieldDecorator('price', {
-            rules: [{ required: true, message: '请输入商品单价！' }],
+            rules: [{ 
+              required: true, message: '请输入商品单价！' 
+            }, { 
+              pattern: /^([1-9](\d+)?|0)(\.\d{1,2})?$/, message: '请输入两位小数！'
+            }],
           })(
             <Input placeholder="请输入商品单价" />
           )}
@@ -103,7 +149,11 @@ class ProductForm extends Component {
 
         <FormItem {...formItemLayout} label="商品数量">
           {getFieldDecorator('num', {
-            rules: [{ required: true, message: '请输入商品数量！' }],
+            rules: [{ 
+              required: true, message: '请输入商品数量！' 
+            }, { 
+              pattern: /^[1-9](\d+)?|0$/, message: '请输入两位整数！'
+            }],
           })(
             <Input placeholder="请输入商品数量" />
           )}
@@ -116,9 +166,14 @@ class ProductForm extends Component {
             <Input type='textarea' placeholder="请输入商品描述" />
           )}
         </FormItem>
+        <FormItem {...tailFormItemLayout}>
+          <Button type="primary" htmlType="submit" onClick={this.onSubmit}>
+            提交
+          </Button>
+        </FormItem>
       </Form>
     );
   }
 };
 
-export default Form.create()(ProductForm)
+export default Form.create()(CreateProduct)
