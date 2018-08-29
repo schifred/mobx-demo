@@ -20,7 +20,7 @@ function stringify(params = {}){
   Object.keys(params).map(key => {
     let value = params[key];
     if ( value !== undefined ){
-      value = encodeURIComponent();
+      value = encodeURIComponent(value);
       query.push(`${key}=${value}`);
     };
   });

@@ -1,23 +1,22 @@
 import React from "react";
 import { render } from "react-dom";
 import { Provider } from "mobx-react";
-import { createHashHistory } from 'history';
-import { Router, Route } from 'react-router';
+import { HashRouter, Route } from 'react-router-dom';
 import DevTools from "mobx-react-devtools";
 import stores from "stores";
 
-import ProductList from "components/ProductList";
+import Products from "pages/products";
 import Product from "pages/product";
 
 render(
   <Provider {...stores}>
-    <Router history={createHashHistory()}>
+    <HashRouter>
       <div>
-        <Route path='/products' component={ProductList} />
+        <Route path='/products' component={Products} />
         <Route path='/create' component={Product} />
         <Route path='/edit/:id' component={Product} />
       </div>
-    </Router>
+    </HashRouter>
   </Provider>,
   document.getElementById("root")
 );

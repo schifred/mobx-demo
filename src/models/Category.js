@@ -9,15 +9,11 @@ export default class Category extends CategoryService {
 
   async getCategory(params){
     const { cid, level } = params;
-    if ( level ){
-      const res = this.getCategoryByLevel(level);
-      return res;
-    };
 
-    if ( cid ){
-      const res = this.getCategoryByCid(cid);
-      return res;
-    };
+    let res = null; 
+    if ( level !== undefined ) res = this.getCategoryByLevel(level);
+    else if ( cid !== undefined ) res = this.getCategoryByCid(cid);
+    return res;
   }
 
   async getCategoryByLevel(level){
@@ -47,13 +43,12 @@ export default class Category extends CategoryService {
 
   @action
   async getCategoryByCid(cid){
-    if ( cache[cid] ){
-      this.insertToCategories(cache[cid]);
+    let cachedItem = cache.filter(item => item.id == cid)[0];
+    if ( cachedItem ){
+      this.insertToCategories(cachedItem);
     } else {
       const res = await super.getCategory({ cid });
       if ( res && res.code === 200 && res.data ){
-        loadByLevelFlags[level] = true;
-
         // 将多次数据变更合成一个事务，减少重绘的次数
         transaction(() => {
           res.data.map(item => {

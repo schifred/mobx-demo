@@ -13,14 +13,13 @@
   "dependencies": {
     "antd": "^3.8.4",
     "axios": "^0.18.0",
-    "history": "^4.7.2",
     "mobx": "5.1.0",
     "mobx-react": "5.2.4",
     "mobx-react-devtools": "^4.2.11",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-helmet": "^5.2.0",
-    "react-router": "4.3.0"
+    "react-router-dom": "^4.3.0"
   },
   "devDependencies": {
     "babel-plugin-import": "^1.6.0",

@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { withRouter } from "react-router";
 import { inject, observer } from "mobx-react";
 import { Form, Input, Cascader, Select, Button } from 'antd';
 
@@ -49,7 +48,6 @@ class CategoryCascader extends Component{
   }
 };
 
-// @withRouter
 @inject('product', 'category')
 @observer
 class CreateProduct extends Component {

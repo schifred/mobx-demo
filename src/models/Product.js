@@ -16,6 +16,7 @@ export default class Product extends ProductService {
   category = new Category();
   attribute = new Attribute();
 
+  @observable id;// 商品id
   @observable name;// 商品名称
   @observable cids;// 商品分类
   @observable attrValues = {};// 商品属性
@@ -39,6 +40,7 @@ export default class Product extends ProductService {
 
       if ( typeof name === 'string' ) this[name] = value;
     } else if ( typeof data === 'object' ){
+      this.id = data.id;
       this.name = data.name;
       this.cids = data.cids;
       this.attrValues = data.attrValues;
@@ -56,6 +58,7 @@ export default class Product extends ProductService {
 
   get(){
     return {
+      id: this.id,
       name: this.name,
       cids: this.cids,
       attrValues: this.attrValues,
@@ -74,7 +77,7 @@ export default class Product extends ProductService {
     if ( !this.cids || !this.cids.length ) return;
     this.categories = [];
     this.cids.map(async cid => {
-      const res = await this.category.getCategory({cid});
+      const res = await this.category.getCategory({ cid });
       this.categories.push(res[0]);
     });
   }
@@ -101,9 +104,9 @@ export default class Product extends ProductService {
   }
   
   @action
-  async getProduct(id){
+  async getProduct(){
     this.reset();
-    const res = await super.getProduct({ id });
+    const res = await super.getProduct({ id: this.id });
     const { data } = res || {};
     if ( data ) this.set(data);
     return data || null;
@@ -117,15 +120,15 @@ export default class Product extends ProductService {
   }
   
   @action
-  async updateProduct(id){
+  async updateProduct(){
     const params = this.get();
-    const res = await super.updateProduct({ id, ...params });
+    const res = await super.updateProduct(params);
     return res;
   }
   
   @action
-  async deleteProduct(id){
-    const res = await super.deleteProduct({ id });
+  async deleteProduct(){
+    const res = await super.deleteProduct({ id: this.id });
     const { data } = res || {};
     if ( data ) this.reset();
     return res;
