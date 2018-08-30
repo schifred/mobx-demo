@@ -22,7 +22,6 @@ export default class Product extends ProductService {
   @observable attrValues = {};// 商品属性
   @observable num;// 库存
   @observable price;// 价格
-  @observable pic_url;// 图片
   @observable desc;// 描述
   @observable status;// 状态
 
@@ -46,7 +45,6 @@ export default class Product extends ProductService {
       this.attrValues = data.attrValues;
       this.num = data.num;
       this.price = data.price;
-      this.pic_url = data.pic_url;
       this.desc = data.desc;
       this.status = data.status;
     };
@@ -64,9 +62,25 @@ export default class Product extends ProductService {
       attrValues: this.attrValues,
       num: this.num,
       price: this.price,
-      pic_url: this.pic_url,
       desc: this.desc,
       status: this.status
+    };
+  }
+
+  // 输出配置页数据
+  toEditValues(){
+    let attrValues = {};
+    Object.keys(this.attrValues).map(attrId => {
+      attrValues[`attrId${attrId}`] = this.attrValues[attrId];
+    });
+
+    return {
+      name: this.name,
+      cids: this.cids,
+      attrs: attrValues,
+      num: this.num,
+      price: this.price,
+      desc: this.desc
     };
   }
 
@@ -77,6 +91,7 @@ export default class Product extends ProductService {
     if ( !this.cids || !this.cids.length ) return;
     this.categories = [];
     this.cids.map(async cid => {
+      if ( !cid ) return;
       const res = await this.category.getCategory({ cid });
       this.categories.push(res[0]);
     });

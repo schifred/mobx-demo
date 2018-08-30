@@ -16,5 +16,6 @@ module.exports = {
         require.resolve('babel-plugin-transform-decorators-legacy')
       ]
     }
-  }
+  },
+  devtool: 'cheap-module-eval-source-map',
 };

@@ -10,7 +10,7 @@ export default class Category extends CategoryService {
   async getCategory(params){
     const { cid, level } = params;
 
-    let res = null; 
+    let res = null;
     if ( level !== undefined ) res = this.getCategoryByLevel(level);
     else if ( cid !== undefined ) res = this.getCategoryByCid(cid);
     return res;
@@ -19,6 +19,7 @@ export default class Category extends CategoryService {
   async getCategoryByLevel(level){
     if ( loadByLevelFlags[level] ){
       cache.map(this.insertToCategories);
+      return this.categories;
     } else {
       const res = await super.getCategory({ level });
       if ( res && res.code === 200 && res.data ){
@@ -46,6 +47,7 @@ export default class Category extends CategoryService {
     let cachedItem = cache.filter(item => item.id == cid)[0];
     if ( cachedItem ){
       this.insertToCategories(cachedItem);
+      return this.categories;
     } else {
       const res = await super.getCategory({ cid });
       if ( res && res.code === 200 && res.data ){
@@ -67,7 +69,7 @@ export default class Category extends CategoryService {
   }
 
   @action
-  insertToCategories(category){
+  insertToCategories = (category) => {
     if ( !this.categories.some(item => item.id == category.id) ){
       this.categories.push(category);
     };

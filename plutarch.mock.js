@@ -100,9 +100,11 @@ module.exports = function(app){
       data: {
         id: 136794125783912,
         name: '苹果8直降',
-        cid: [0, 2],
+        cids: [0, 2],
+        attrValues: {0: [300], 1: [310]},
         price: 4500,
-        num: 999
+        num: 999,
+        desc: '苹果手机'
       }
     });
   });

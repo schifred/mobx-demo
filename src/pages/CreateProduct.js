@@ -5,36 +5,23 @@ import { Form, Input, Cascader, Select, Button } from 'antd';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 4 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 8 },
-  },
-};
-const tailFormItemLayout = {
-  wrapperCol: {
-    xs: {
-      span: 24,
-      offset: 0,
-    },
-    sm: {
-      span: 8,
-      offset: 4,
-    },
-  },
-};
+const formItemLayout = { labelCol: { span: 4 }, wrapperCol: { span: 8 } };
+const tailFormItemLayout = { wrapperCol: { span: 8, offset: 4 } };
 
 @inject('category')
 @observer
 class CategoryCascader extends Component{
-  componentDidMount(){
-    const { category } = this.props;
-    category.getCategory({ level: 1 });
-  }
+  // componentDidMount(){
+  //   const { category, value } = this.props;
+  //   category.getCategory({ level: 1 });
+  // }
+
+  // componentWillReceiveProps(nextProps){
+  //   const { value } = this.props;
+  //   const { value: nextValue, category } = nextProps;
+  //   if ( value !== nextValue ) 
+  //     category.getCategory({ level: nextValue.length });
+  // }
 
   loadData = (selectedOptions) => {
     const { category } = this.props;
@@ -52,18 +39,40 @@ class CategoryCascader extends Component{
 @observer
 class CreateProduct extends Component {
   componentDidMount(){
-    const { product, form, match: { params: { id } } } = this.props;
-    if ( id !== undefined ) 
-      product.getProduct(id).then(res => {
-        form.setFieldsValue(res);
-      });
+    const { product, category, form, match: { params: { id } } } = this.props;
+    if ( id !== undefined ){
+      // product.getProduct(id).then(res => {
+      //   product.set(res);
+      //   form.setFieldsValue(product.toEditValues());
+      // })
+      Promise.all([
+        category.getCategory({ level: 1 }),
+        product.getProduct(id)
+      ]).then(([categories, productInfo]) => {
+        const { cids } = productInfo;
+        Promise.all([
+          category.getCategory({ level: cids.length }),
+          this.loadAttributes(cids[cids.length - 1])
+        ]).then(res => {
+          product.set(productInfo);
+          form.setFieldsValue(product.toEditValues());
+        })
+      })
+    } else {
+      category.getCategory({ level: 1 });
+    }
+  }
+
+  // 通过 cid 加载商品属性，用于显示商品属性表单项
+  async loadAttributes(cid){
+    const { product } = this.props;
+    if ( cid ) return await product.getAttributes(cid);
   }
 
   // 分类属性变更
   handleCategoryChange = value => {
-    const { product } = this.props;
     const len = value.length;
-    if ( len == 2 ) product.getAttributes(value[len - 1]);
+    if ( len == 2 ) this.loadAttributes(value[len - 1]);
   }
 
   // 提交数据
