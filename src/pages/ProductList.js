@@ -1,64 +1,52 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { inject, observer } from "mobx-react";
-import { Table } from 'antd';
-
-// 远程获取的数组项数据需要重新设置观察者，以驱动视图更新
-@observer
-class CategoryText extends Component{
-  componentWillMount(){
-    const { product } = this.props;
-    product.getCategories();
-  }
-
-  render(){
-    const { product } = this.props;
-    return product.categoryTexts;
-  }
-};
+import CategoryText from './components/CategoryText';
+import { Table, Button } from 'antd';
+import $i18n from "utils/$i18n";
 
 @inject('products')
 @observer
 export default class ProductList extends Component {
   columns = [{
-    title: '商品id',
+    title: $i18n('model.product.id'),
     dataIndex: 'id',
     key: 'id'
   }, {
-    title: '名称',
+    title: $i18n('model.product.name'),
     dataIndex: 'name',
     key: 'name',
   }, {
-    title: '分类',
+    title: $i18n('model.product.categories'),
     dataIndex: 'categories',
     key: 'categories',
     render: (categories, product) => {
       return <CategoryText product={product}/>
     }
   }, {
-    title: '价格',
+    title: $i18n('model.product.price'),
     dataIndex: 'price',
     key: 'price'
   }, {
-    title: '数量',
+    title: $i18n('model.product.num'),
     dataIndex: 'num',
     key: 'num'
   }, {
-    title: '状态',
+    title: $i18n('model.product.status'),
     dataIndex: 'statusText',
     key: 'statusText'
   }, {
-    title: '描述',
+    title: $i18n('model.product.desc'),
     dataIndex: 'desc',
     key: 'desc'
   }, {
-    title: '操作',
+    title: $i18n('handler.handle'),
     key: 'action',
     render: (text, product) => (
       <span>
-        <a href="javascript:;" style={{marginRight: '10px'}}>详情</a>
-        <Link to={`edit/${product.id}`} style={{marginRight: '10px'}}>编辑</Link>
-        <a href="javascript:;" onClick={() => { product.deleteProduct() }}>删除</a>
+        <Link to={`/detail/${product.id}`} style={{marginRight: '10px'}}>{$i18n('handler.detail')}</Link>
+        <Link to={`/edit/${product.id}`} style={{marginRight: '10px'}}>{$i18n('handler.edit')}</Link>
+        <a href="javascript:;" onClick={() => { product.deleteProduct() }}>{$i18n('handler.delete')}</a>
       </span>
     ),
   }];
@@ -70,6 +58,13 @@ export default class ProductList extends Component {
   render(){
     const { products } = this.props.products;
 
-    return <Table size="small" rowKey='id' columns={this.columns} dataSource={products.toJS()} />;
+    return (
+      <div>
+        <Button style={{marginBottom: '15px'}} type='primary'>
+          <Link to={'/create'}>创建商品</Link>
+        </Button>
+        <Table size="small" rowKey='id' columns={this.columns} dataSource={products.toJS()} />
+      </div>
+    );
   }
 };

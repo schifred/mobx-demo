@@ -2,7 +2,7 @@ import { observable, action, computed } from "mobx";
 import ProductService from 'services/product';
 import Category from './Category';
 import Attribute from './Attribute';
-import { mixin } from 'utils/decorator';
+import { mixin, mixinLocale } from 'utils/decorator';
 
 const StatusList = [{
   text: '下架', value: 'offline'
@@ -10,6 +10,7 @@ const StatusList = [{
   text: '上架', value: 'online'
 }]
 
+@mixinLocale('model.product')
 export default class Product extends ProductService {
   static StatusList = StatusList;
 
@@ -25,7 +26,7 @@ export default class Product extends ProductService {
   @observable desc;// 描述
   @observable status;// 状态
 
-  @observable categories = [];// 商品分量全量信息
+  @observable categories = [];// 商品分类全量信息
 
   constructor(props){
     super(props);

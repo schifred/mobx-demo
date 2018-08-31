@@ -3,8 +3,13 @@ import { render } from "react-dom";
 import { Provider } from "mobx-react";
 import { HashRouter, Route } from 'react-router-dom';
 import DevTools from "mobx-react-devtools";
-import stores from "stores";
+import $i18n from "utils/$i18n";
+import zh from 'locales/zh';
 
+$i18n.setLocale('zh');
+$i18n.registerLanguagePack('zh', zh);
+
+import stores from "stores";
 import ProductList from "pages/ProductList";
 import CreateProduct from "pages/CreateProduct";
 import ProductDetail from "pages/ProductDetail";
