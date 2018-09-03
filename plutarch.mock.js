@@ -10,6 +10,14 @@ const catrgories = [{
 
 // plutarch.mock.js
 module.exports = function(app){
+  app.get('/api/products1111',(req, res) => {
+    res.send({
+      code: 403,
+      success: true
+    });
+  });
+
+
   // 获取产品类目
   app.get('/api/category',(req, res) => {
     const { query: { level, cid } } = req;

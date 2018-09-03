@@ -33,26 +33,16 @@ export default class Product extends ProductService {
     this.set(props);
   }
 
-  set(data){
-    if ( arguments.length > 1 ){
-      let name = arguments[0];
-      let value = arguments[1];
-
-      if ( typeof name === 'string' ) this[name] = value;
-    } else if ( typeof data === 'object' ){
-      this.id = data.id;
-      this.name = data.name;
-      this.cids = data.cids;
-      this.attrValues = data.attrValues;
-      this.num = data.num;
-      this.price = data.price;
-      this.desc = data.desc;
-      this.status = data.status;
-    };
-  }
-
-  reset(){
-    this.set({});
+  // 数据全量更新；部分更新可使用赋值语句；重置可传空
+  set(data = {}){
+    this.id = data.id;
+    this.name = data.name;
+    this.cids = data.cids;
+    this.attrValues = data.attrValues;
+    this.num = data.num;
+    this.price = data.price;
+    this.desc = data.desc;
+    this.status = data.status;
   }
 
   get(){
@@ -121,7 +111,7 @@ export default class Product extends ProductService {
   
   @action
   async getProduct(){
-    this.reset();
+    this.set();
     const res = await super.getProduct({ id: this.id });
     const { data } = res || {};
     if ( data ) this.set(data);
@@ -146,7 +136,7 @@ export default class Product extends ProductService {
   async deleteProduct(){
     const res = await super.deleteProduct({ id: this.id });
     const { data } = res || {};
-    if ( data ) this.reset();
+    if ( data ) this.set();
     return res;
   }
 }

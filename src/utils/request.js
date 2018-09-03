@@ -1,31 +1,86 @@
 import axios from 'axios';
+import { message as antdMessage } from 'antd';
 
 export async function get(url, params, opts){
-  const res = await axios.get(`${url}${stringify(params)}`, opts);
-  return res.data;
+  const res = await request('get', url, params, opts);
+  return res;
 };
 
 export async function post(url, params, opts){
-  const res = await axios.post(url, params, opts);
+  const res = await request('post', url, params, opts);
   return res.data;
 };
 
 export async function del(url, params, opts){
-  const res = await axios.delete(`${url}${stringify(params)}`, opts);
+  const res = await request('delete', url, params, opts);
   return res.data;
 };
 
-function stringify(params = {}){
-  let query = [];
-  Object.keys(params).map(key => {
-    let value = params[key];
-    if ( value !== undefined ){
-      value = encodeURIComponent(value);
-      query.push(`${key}=${value}`);
-    };
+// 获取响应，通过 catch 语句显示错误内容
+function request(method, url, params, opts){
+  return new Promise(async (resolve, reject) => {
+    const res = await axios.request({
+      method, 
+      url, 
+      params: ['get', 'delete'].indexOf(method) !== -1 ? params : undefined,
+      data: ['post', 'put'].indexOf(method) !== -1 ? params : undefined, 
+      timeout: 1000,
+      opts
+    }).catch(err => {
+      showError(err);
+    });
+
+    if ( !res ) return;
+    
+    const { data } = res;
+    resolve(data);
   });
+};
 
-  query = query.join('&');
+// 使用拦截器处理状态码及 code 值，在 axios - then/catch 回调前执行
+axios.interceptors.response.use(res => {
+  const { data, status, statusText, request } = res;
+  const { responseURL: url } = request;
 
-  return query ? `?${query}` : '';
+  // http 状态码
+  if ( status != 200 ){
+    return Promise.reject({
+      code: status,
+      messsage: statusText,
+      url,
+    });
+  };
+  
+  const { code, message } = data;
+
+  // 响应 code 值
+  if ( code == 403 ){
+    return Promise.reject({
+      code,
+      message: 'no permission',
+      url,
+    });
+  } else if ( code != 200 ){
+    return Promise.reject({
+      code,
+      message,
+      url,
+    });
+  };
+
+  return data;
+}, err => {
+  return Promise.reject(err);
+});
+
+// 显示错误。antd 特性：多个错误可以平铺展示
+function showError(error){
+  const { code, message, url } = error;
+  antdMessage.error(message
+    // <div>
+    //   <div>{`url: ${url}`}</div>
+    //   <div>{`code: ${code}`}</div>
+    //   <div>{`message: ${message}`}</div>
+    // </div>
+  );
 };

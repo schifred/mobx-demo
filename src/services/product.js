@@ -7,7 +7,7 @@ export default class ProductService {
   }
 
   async getProducts(params){
-    const res = await get('/api/products', params);
+    const res = await get('/api/products1111', params);
     return res;
   }
 
