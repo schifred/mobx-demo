@@ -2,7 +2,7 @@ import { observable, action, computed } from "mobx";
 import ProductService from 'services/product';
 import Category from './Category';
 import Attribute from './Attribute';
-import { mixin, mixinLocale } from 'utils/decorator';
+import { mixin, mixinLocale, mixinStaticProperty } from 'utils/decorator';
 
 const StatusList = [{
   text: '下架', value: 'offline'
@@ -10,8 +10,10 @@ const StatusList = [{
   text: '上架', value: 'online'
 }]
 
-@mixinLocale('model.product')
-export default class Product extends ProductService {
+// @mixinLocale('model.product')
+// 可采用继承的方式将远程请求方法混入到 Product 类中，此处使用 mixinStaticProperty 装饰器混入静态方法
+@mixinStaticProperty(ProductService)
+export default class Product {
   static StatusList = StatusList;
 
   category = new Category();
@@ -29,7 +31,7 @@ export default class Product extends ProductService {
   @observable categories = [];// 商品分类全量信息
 
   constructor(props){
-    super(props);
+    // super(props);
     this.set(props);
   }
 
@@ -112,31 +114,29 @@ export default class Product extends ProductService {
   @action
   async getProduct(){
     this.set();
-    const res = await super.getProduct({ id: this.id });
-    const { data } = res || {};
-    if ( data ) this.set(data);
-    return data || null;
+    const res = await Product.getProduct({ id: this.id });
+    if ( res ) this.set(res);
+    return res || null;
   }
   
   @action
   async saveProduct(){
     const params = this.get();
-    const res = await super.saveProduct(params);
+    const res = await Product.saveProduct(params);
     return res;
   }
   
   @action
   async updateProduct(){
     const params = this.get();
-    const res = await super.updateProduct(params);
+    const res = await Product.updateProduct(params);
     return res;
   }
   
   @action
   async deleteProduct(){
-    const res = await super.deleteProduct({ id: this.id });
-    const { data } = res || {};
-    if ( data ) this.set();
+    const res = await Product.deleteProduct({ id: this.id });
+    if ( res ) this.set();
     return res;
   }
 }

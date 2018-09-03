@@ -1,13 +1,14 @@
 import { get, post, del } from 'utils/request';
 
 export default class ProductService {
-  async getProduct(params){
-    const res = await get('/api/product', params);
+  // service 中校验必传参数，可以在本地模式中解决掉参数遗漏的问题
+  async getProduct({ id }){
+    const res = await get('/api/product', { id });
     return res;
   }
 
-  async getProducts(params){
-    const res = await get('/api/products1111', params);
+  async getProducts(){
+    const res = await get('/api/products');
     return res;
   }
 
@@ -16,13 +17,13 @@ export default class ProductService {
     return res;
   }
 
-  async updateProduct(params){
-    const res = await post('/api/product', params);
+  async updateProduct({ id, ...params }){
+    const res = await post('/api/product', { id, ...params });
     return res;
   }
 
-  async deleteProduct(params){
-    const res = await del('/api/product', params);
+  async deleteProduct({ id }){
+    const res = await del('/api/product', { id });
     return res;
   }
 }

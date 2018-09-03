@@ -1,16 +1,19 @@
 import axios from 'axios';
 import { message as antdMessage } from 'antd';
 
+// get 请求，通过 axios.request 发送实际请求
 export async function get(url, params, opts){
   const res = await request('get', url, params, opts);
   return res;
 };
 
+// post 请求
 export async function post(url, params, opts){
   const res = await request('post', url, params, opts);
   return res.data;
 };
 
+// delete 请求
 export async function del(url, params, opts){
   const res = await request('delete', url, params, opts);
   return res.data;
@@ -32,6 +35,7 @@ function request(method, url, params, opts){
 
     if ( !res ) return;
     
+    // service 获得数据为实际所需的数据
     const { data } = res;
     resolve(data);
   });

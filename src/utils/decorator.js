@@ -36,7 +36,27 @@ export function mixinLocale(prefix){
 
     return Cls;
   };
-}
+};
+
+// 将 MixinCls 的实例方法混入到 Cls 类的静态方法中
+export function mixinStaticProperty(MixinCls){
+  const mixinPrototype = MixinCls.prototype;// 获取原型
+  let mixinProperties = Object.getOwnPropertyNames(mixinPrototype);// 从原型中取出实例方法
+  mixinProperties = mixinProperties.filter(key => {
+    return key !== 'constructor';
+  });
+
+  return function (Cls){
+    mixinProperties.map(propertyName => {
+      addEnumerableProp(Cls, propertyName, () => {
+        return mixinPrototype[propertyName];
+      });
+    });
+
+    console.dir(Cls)
+    return Cls;
+  };
+};
 
 function addHiddenProp(object, propName, value) {
   Object.defineProperty(object, propName, {

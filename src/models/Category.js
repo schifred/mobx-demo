@@ -21,7 +21,7 @@ export default class Category extends CategoryService {
       cache.map(this.insertToCategories);
       return this.categories;
     } else {
-      const res = await super.getCategory({ level });
+      const res = await super.getCategoryByLevel(level);
       if ( res && res.code === 200 && res.data ){
         loadByLevelFlags[level] = true;
 
@@ -49,7 +49,7 @@ export default class Category extends CategoryService {
       this.insertToCategories(cachedItem);
       return this.categories;
     } else {
-      const res = await super.getCategory({ cid });
+      const res = await super.getCategoryByCid(cid);
       if ( res && res.code === 200 && res.data ){
         // 将多次数据变更合成一个事务，减少重绘的次数
         transaction(() => {
