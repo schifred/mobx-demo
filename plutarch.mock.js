@@ -113,6 +113,9 @@ module.exports = function(app){
   app.post('/api/product', (req, res) => {
     res.send({
       code: 200,
+      data: {
+        id: 12345456567
+      },
       success: true
     });
   });
@@ -121,6 +124,7 @@ module.exports = function(app){
   app.delete('/api/product', (req, res) => {
     res.send({
       code: 200,
+      data: true,
       success: true
     });
   });

@@ -10,13 +10,13 @@ export async function get(url, params, opts){
 // post 请求
 export async function post(url, params, opts){
   const res = await request('post', url, params, opts);
-  return res.data;
+  return res;
 };
 
 // delete 请求
 export async function del(url, params, opts){
   const res = await request('delete', url, params, opts);
-  return res.data;
+  return res;
 };
 
 // 获取响应，通过 catch 语句显示错误内容

@@ -2,13 +2,13 @@ import { observable, action } from "mobx";
 import Product from 'models/Product';
 
 // 直接与页面交互的 model
-class Products {
+class ProductList {
   @observable products = [];
   
   @action
   async getProducts(){
     this.products = [];
-    const res = await Product.getProducts();
+    const res = await Product.query();
     (res || []).map(item => {
       this.products.push(new Product(item));
     });
@@ -17,4 +17,4 @@ class Products {
   }
 };
 
-export default new Products();
+export default new ProductList();

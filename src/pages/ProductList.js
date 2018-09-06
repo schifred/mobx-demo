@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { inject, observer } from "mobx-react";
 import CategoryText from './components/CategoryText';
-import { Table, Button } from 'antd';
+import { Table, Button, Popconfirm, message } from 'antd';
 import $i18n from "utils/$i18n";
 
-@inject('products')
+@inject('productList')
 @observer
 export default class ProductList extends Component {
   columns = [{
@@ -42,26 +42,40 @@ export default class ProductList extends Component {
   }, {
     title: $i18n('handler.handle'),
     key: 'action',
-    render: (text, product) => (
+    render: (text, product, index) => (
       <span>
         <Link to={`/detail/${product.id}`} style={{marginRight: '10px'}}>{$i18n('handler.detail')}</Link>
         <Link to={`/edit/${product.id}`} style={{marginRight: '10px'}}>{$i18n('handler.edit')}</Link>
-        <a href="javascript:;" onClick={() => { product.deleteProduct() }}>{$i18n('handler.delete')}</a>
+        <Popconfirm title={$i18n('text.product.delete_confirm')} 
+          onConfirm={() => { this.deleteProduct(product, index) }} 
+          okText={$i18n('handler.ok')} cancelText={$i18n('handler.cancel')}>
+          <a href="javascript:;">{$i18n('handler.delete')}</a>
+        </Popconfirm>
       </span>
     ),
   }];
 
-  componentWillMount(){
-    this.props.products.getProducts();
+  componentDidMount(){
+    this.props.productList.getProducts();
+  }
+
+  // 删除商品
+  deleteProduct = async (product, index) => {
+    const { products } = this.props.productList;
+    const res = await product.deleteProduct();
+    if ( res ){
+      products.splice(index);
+      message.success($i18n('text.product.delete_success'));
+    };
   }
 
   render(){
-    const { products } = this.props.products;
-
+    const { products } = this.props.productList;
+    
     return (
       <div>
         <Button style={{marginBottom: '15px'}} type='primary'>
-          <Link to={'/create'}>创建商品</Link>
+          <Link to={'/create'}>{`${$i18n('handler.create')}${$i18n('text.product')}`}</Link>
         </Button>
         <Table size="small" rowKey='id' columns={this.columns} dataSource={products.toJS()} />
       </div>

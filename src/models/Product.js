@@ -114,7 +114,7 @@ export default class Product {
   @action
   async getProduct(){
     this.set();
-    const res = await Product.getProduct({ id: this.id });
+    const res = await Product.get({ id: this.id });
     if ( res ) this.set(res);
     return res || null;
   }
@@ -122,21 +122,21 @@ export default class Product {
   @action
   async saveProduct(){
     const params = this.get();
-    const res = await Product.saveProduct(params);
+    const res = await Product.save(params);
     return res;
   }
   
   @action
   async updateProduct(){
     const params = this.get();
-    const res = await Product.updateProduct(params);
+    const res = await Product.update(params);
     return res;
   }
   
   @action
   async deleteProduct(){
-    const res = await Product.deleteProduct({ id: this.id });
-    if ( res ) this.set();
+    const res = await Product.del({ id: this.id });
     return res;
   }
+
 }
