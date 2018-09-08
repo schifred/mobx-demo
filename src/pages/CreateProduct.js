@@ -36,38 +36,28 @@ class CategoryCascader extends Component{
   }
 };
 
-@inject('product', 'category')
+@inject('productEdit', 'category')
 @observer
 class CreateProduct extends Component {
-  componentDidMount(){
-    const { product, category, form, match: { params: { id } } } = this.props;
-    if ( id !== undefined ){
-      // product.getProduct(id).then(res => {
-      //   product.set(res);
-      //   form.setFieldsValue(product.toEditValues());
-      // })
-      Promise.all([
-        category.getCategory({ level: 1 }),
-        product.getProduct(id)
-      ]).then(([categories, productInfo]) => {
-        const { cids } = productInfo;
-        Promise.all([
-          category.getCategory({ level: cids.length }),
-          this.loadAttributes(cids[cids.length - 1])
-        ]).then(res => {
-          product.set(productInfo);
-          form.setFieldsValue(product.toEditValues());
-        })
-      })
-    } else {
-      category.getCategory({ level: 1 });
-    }
+  componentWillMount(){
+    const { productEdit: product, match: { params: { id } } } = this.props;
+    product.setId(id);
   }
 
-  // 通过 cid 加载商品属性，用于显示商品属性表单项
-  async loadAttributes(cid){
-    const { product } = this.props;
-    if ( cid ) return await product.getAttributes(cid);
+  componentDidMount(){
+    const { productEdit: product, category, form } = this.props;
+    Promise.all([
+      category.getCategory({ level: 1 }),
+      product.getProduct()
+    ]).then(([categories, productInfo]) => {
+      const { cids } = productInfo;
+      Promise.all([
+        category.getCategory({ level: cids.length }),
+        product.getAttributes()
+      ]).then(res => {
+        form.setFieldsValue(product.pageValues);
+      })
+    });
   }
 
   // 分类属性变更
@@ -78,10 +68,9 @@ class CreateProduct extends Component {
 
   // 提交数据
   onSubmit = () => {
-    const { product, form, match: { params: { id } } } = this.props;
+    const { productEdit: product, form, match: { params: { id } } } = this.props;
 
     form.validateFields((errs, vals) => {
-      console.log(vals)
       if ( errs ) return;
 
       let attrValues = {};
@@ -102,7 +91,7 @@ class CreateProduct extends Component {
   }
 
   render(){
-    const { product, form } = this.props;
+    const { productEdit: product, form } = this.props;
     const { getFieldDecorator } = form;
 
     return (

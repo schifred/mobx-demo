@@ -4,6 +4,13 @@ import CategoryService from 'services/category';
 export default class Category extends CategoryService {
   @observable categories = [];
 
+  @action
+  insertToCategories = (category = {}) => {
+    if ( !this.categories.some(item => item.id == category.id) ){
+      this.categories.push(category);
+    };
+  }
+
   async getCategory(params){
     const res = await super.getCategory(params);
     if ( res ){
@@ -18,11 +25,20 @@ export default class Category extends CategoryService {
     return res;
   }
 
-  @action
-  insertToCategories = (category) => {
-    if ( !this.categories.some(item => item.id == category.id) ){
-      this.categories.push(category);
-    };
+  // 处理并行请求
+  getCategoryByCids(cids){
+    return new Promise((resolve, reject) => {
+      this.categories = [];
+  
+      cids.map(async cid => {
+        const res = await this.getCategory({ cid });
+        if ( !res ) reject(res);
+
+        // 最后一个请求，响应通过 insertToCategories 方法收集到 categories 属性中
+        if ( cids.length == this.categories.length ) 
+          resolve(this.categories);
+      });
+    });
   }
 
   @computed

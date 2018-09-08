@@ -1,37 +1,35 @@
-import { observable, action, computed } from "mobx";
-import Product from 'models/Product';
+import { observable, action, computed, transaction } from "mobx";
+import Product from '../models/Product';
 
-// 直接与页面交互的 model
-class ProductEdit {
-  @observable product = new Product();
-  
+export default class ProductInEdit extends Product {
+  @observable attributes = [];// 商品属性全量信息
+
+  // 获取属性
   @action
-  async getProduct(){
-    this.product = {};
-    const res = await Product.get();
-    if ( res ) this.product = new Product(res);
-
+  async getAttributes(){
+    if ( !this.cids || this.cids.length !== 2 ) return;
+    this.attributes = [];
+    const cid = this.cids[this.cids.length - 1];
+    const res = await this.attribute.getAttributes({ cid  });
+    if ( res ) this.attributes = res;
     return res;
   }
-  
-  @computed
-  get values(){
-    const { name, cids, attrValues, num, price, desc } = this.product;
 
-    let attrs = {};
-    Object.keys(attrValues).map(attrId => {
-      attrs[`attrId${attrId}`] = attrValues[attrId];
+  // 编辑页显示数据
+  @computed
+  get pageValues(){
+    let attrValues = {};
+    Object.keys(this.attrValues).map(attrId => {
+      attrValues[`attrId${attrId}`] = this.attrValues[attrId];
     });
 
     return {
-      name,
-      cids,
-      attrs,
-      num,
-      price,
-      desc
+      name: this.name,
+      cids: this.cids,
+      attrs: attrValues,
+      num: this.num,
+      price: this.price,
+      desc: this.desc
     };
   }
-};
-
-export default new ProductEdit();
+}

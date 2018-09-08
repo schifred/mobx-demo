@@ -40,16 +40,16 @@ export default class ProductList extends Component {
     dataIndex: 'desc',
     key: 'desc'
   }, {
-    title: $i18n('handler.handle'),
+    title: $i18n('action.handle'),
     key: 'action',
     render: (text, product, index) => (
       <span>
-        <Link to={`/detail/${product.id}`} style={{marginRight: '10px'}}>{$i18n('handler.detail')}</Link>
-        <Link to={`/edit/${product.id}`} style={{marginRight: '10px'}}>{$i18n('handler.edit')}</Link>
+        <Link to={`/detail/${product.id}`} style={{marginRight: '10px'}}>{$i18n('text.detail')}</Link>
+        <Link to={`/edit/${product.id}`} style={{marginRight: '10px'}}>{$i18n('action.edit')}</Link>
         <Popconfirm title={$i18n('text.product.delete_confirm')} 
           onConfirm={() => { this.deleteProduct(product, index) }} 
-          okText={$i18n('handler.ok')} cancelText={$i18n('handler.cancel')}>
-          <a href="javascript:;">{$i18n('handler.delete')}</a>
+          okText={$i18n('action.ok')} cancelText={$i18n('action.cancel')}>
+          <a href="javascript:;">{$i18n('action.delete')}</a>
         </Popconfirm>
       </span>
     ),
@@ -75,7 +75,7 @@ export default class ProductList extends Component {
     return (
       <div>
         <Button style={{marginBottom: '15px'}} type='primary'>
-          <Link to={'/create'}>{`${$i18n('handler.create')}${$i18n('text.product')}`}</Link>
+          <Link to={'/create'}>{`${$i18n('action.create')}${$i18n('text.product')}`}</Link>
         </Button>
         <Table size="small" rowKey='id' columns={this.columns} dataSource={products.toJS()} />
       </div>
