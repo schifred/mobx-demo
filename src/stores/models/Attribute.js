@@ -8,7 +8,6 @@ export default class Attribute extends AttributeService {
   async getAttributes(params){
     const res = await super.getAttributes(params);
     if ( res ) this.attributes = res;
-    console.log(res)
     
     return res;
   }

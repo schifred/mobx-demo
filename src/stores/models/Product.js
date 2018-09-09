@@ -59,24 +59,30 @@ export default class Product {
   }
   
   @action
-  async getProduct(){
-    this.setValues();
-    const res = await Product.get({ id: this.id });
+  async getProduct(id){
+    const res = await Product.get({ id });
     if ( res ) this.setValues(res);
     return res || null;
   }
   
+  // @action
+  // async createProduct(){
+  //   const params = this.getValues();
+  //   const res = await Product.save(params);
+  //   return res;
+  // }
+  
+  // @action
+  // async updateProduct(){
+  //   const params = this.getValues();
+  //   const res = await Product.update(params);
+  //   return res;
+  // }
+  
   @action
   async saveProduct(){
     const params = this.getValues();
-    const res = await Product.save(params);
-    return res;
-  }
-  
-  @action
-  async updateProduct(){
-    const params = this.getValues();
-    const res = await Product.update(params);
+    const res = params.id ? await Product.update(params) : await Product.save(params);
     return res;
   }
   

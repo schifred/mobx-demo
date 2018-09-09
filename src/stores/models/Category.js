@@ -41,6 +41,18 @@ export default class Category extends CategoryService {
     });
   }
 
+  // 传入 cids，便于并行请求
+  getCategoryByLevels(cids){
+    return new Promise((resolve, reject) => {
+      cids.map(async (cid, index) => {
+        const res = await this.getCategory({ level: index + 1 });
+        if ( !res ) reject(res);
+
+        if ( index + 1 === cids.length ) resolve(this.categories);
+      });
+    })
+  }
+
   @computed
   get categoriesTree(){
     let tree = [];

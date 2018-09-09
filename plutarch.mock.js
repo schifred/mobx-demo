@@ -38,7 +38,7 @@ module.exports = function(app){
         code: 200,
         success: true,
         data: [{
-          id: 0, name: '品牌', order: 0, type: 'enum', values: [{
+          id: 0, name: '品牌', order: 0, type: 'enum', options: [{
             name: '苹果', value: 'Iphone', id: 300
           }, {
             name: '华为', value: 'Huawei', id: 301
@@ -46,7 +46,7 @@ module.exports = function(app){
             name: '小米', value: 'MI', id: 302
           }]
         }, {
-          id: 1, name: '运行内存', order: 0, type: 'enum', values: [{
+          id: 1, name: '运行内存', order: 0, type: 'enum', options: [{
             name: '4GB', value: '4GB', id: 310
           }, {
             name: '6GB', value: '6GB', id: 311
@@ -60,7 +60,7 @@ module.exports = function(app){
         code: 200,
         success: true,
         data: [{
-          id: 2, name: '季节', order: 0, type: 'enum', values: [{
+          id: 2, name: '季节', order: 0, type: 'enum', options: [{
             name: '春季', value: 'spring', id: 401
           }, {
             name: '夏季', value: 'summer', id: 401

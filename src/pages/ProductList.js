@@ -21,7 +21,7 @@ export default class ProductList extends Component {
     dataIndex: 'categories',
     key: 'categories',
     render: (categories, product) => {
-      return <CategoryText product={product}/>
+      return <CategoryText product={product} loadCategory={true} />
     }
   }, {
     title: $i18n('model.product.price'),

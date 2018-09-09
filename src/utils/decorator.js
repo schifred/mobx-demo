@@ -53,7 +53,6 @@ export function mixinStaticProperty(MixinCls){
       });
     });
 
-    console.dir(Cls)
     return Cls;
   };
 };

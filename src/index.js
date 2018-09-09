@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "react-dom";
 import { Provider } from "mobx-react";
-import { HashRouter, Route } from 'react-router-dom';
+import { HashRouter, Route, Redirect } from 'react-router-dom';
 import DevTools from "mobx-react-devtools";
 import $i18n from "utils/$i18n";
 import zh from 'locales/zh';

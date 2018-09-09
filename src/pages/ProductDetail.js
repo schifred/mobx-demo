@@ -3,6 +3,7 @@ import { inject, observer } from "mobx-react";
 import { Link } from "react-router-dom";
 import { Collapse, Button } from 'antd';
 import CategoryText from './components/CategoryText';
+import { DetailUnits as Attributes } from './components/Attributes';
 import $i18n from "utils/$i18n";
 
 const { Panel } = Collapse;
@@ -14,37 +15,25 @@ export default class ProductDetail extends Component {
     const { productDetail: product, category, match: { params: { id } } } = this.props;
     product.getProduct(id).then(res => {
       if ( !res ) return;
-      product.getCategories();
-      product.getAttributes();
+
+      const { cids } = product;
+      product.getCategories(cids);
+      product.getAttributes(cids[cids.length - 1]);
     });
-    // Promise.all([
-    //   category.getCategory({ level: 1 }),
-    //   product.getProduct(id)
-    // ]).then(([categories, productInfo]) => {
-    //   const { cids } = productInfo;
-    //   Promise.all([
-    //     category.getCategory({ level: cids.length }),
-    //     this.loadAttributes(cids[cids.length - 1])
-    //   ]).then(res => {
-    //     product.setValues(productInfo);
-    //   })
-    // })
   }
 
   render(){
     const { productDetail: product } = this.props;
-
-    console.log(product.attributes.toJS())
     
     return (
       <Collapse defaultActiveKey={['1']}>
         <Panel header={`${$i18n('text.product')}${$i18n('text.detail')} id:${product.id}`} key="1">
-          <div>{$i18n('model.product.name')}：{product.name}</div>
-          <div>{$i18n('model.product.categories')}：<CategoryText product={product} /></div>
-          <div>{$i18n('model.product.attrs')}：<CategoryText product={product} /></div>
-          <div>{$i18n('model.product.price')}：{product.price}</div>
-          <div>{$i18n('model.product.num')}：{product.num}</div>
-          <div>{$i18n('model.product.desc')}：{product.desc}</div>
+          <div style={{display: 'flex'}}>{$i18n('model.product.name')}：{product.name}</div>
+          <div style={{display: 'flex'}}>{$i18n('model.product.categories')}：<CategoryText product={product} /></div>
+          <div style={{display: 'flex'}}>{$i18n('model.product.attrs')}：<Attributes attributeTexts={product.attributeTexts} /></div>
+          <div style={{display: 'flex'}}>{$i18n('model.product.price')}：{product.price}</div>
+          <div style={{display: 'flex'}}>{$i18n('model.product.num')}：{product.num}</div>
+          <div style={{display: 'flex'}}>{$i18n('model.product.desc')}：{product.desc}</div>
 
           <div>
             <Button style={{marginTop: '10px'}} type='primary'>

@@ -6,10 +6,8 @@ export default class ProductInEdit extends Product {
 
   // 获取属性
   @action
-  async getAttributes(){
-    if ( !this.cids || this.cids.length !== 2 ) return;
+  async getAttributes(cid){
     this.attributes = [];
-    const cid = this.cids[this.cids.length - 1];
     const res = await this.attribute.getAttributes({ cid  });
     if ( res ) this.attributes = res;
     return res;

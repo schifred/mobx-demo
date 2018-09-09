@@ -6,4 +6,5 @@ export default {
   'action.ok': '确认',
   'action.cancel': '取消',
   'action.return': '返回',
+  'action.submit': '提交',
 }

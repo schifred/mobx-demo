@@ -10,7 +10,7 @@ export default class Cache {
   // 获取数据缓存
   getCache(actionName, key){
     const cache = caches[actionName];
-    return cache && key ? cache[key] : cache;
+    return cache && key !== undefined ? cache[key] : cache;
   }
 
   // 清除数据缓存

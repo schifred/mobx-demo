@@ -1,69 +1,43 @@
 import React, { Component } from "react";
 import { inject, observer } from "mobx-react";
-import { Collapse, Form, Input, Cascader, Select, Button } from 'antd';
+import { Collapse, Form, Input, Button } from 'antd';
+import CategoryCascader from './components/CategoryCascader';
+import { EditUnits as Attributes } from './components/Attributes';
+import $i18n from "utils/$i18n";
 
 const { Panel } = Collapse;
 const FormItem = Form.Item;
-const Option = Select.Option;
 
 const formItemLayout = { labelCol: { span: 4 }, wrapperCol: { span: 8 } };
 const tailFormItemLayout = { wrapperCol: { span: 8, offset: 4 } };
 
-@inject('category')
-@observer
-class CategoryCascader extends Component{
-  // componentDidMount(){
-  //   const { category, value } = this.props;
-  //   category.getCategory({ level: 1 });
-  // }
-
-  // componentWillReceiveProps(nextProps){
-  //   const { value } = this.props;
-  //   const { value: nextValue, category } = nextProps;
-  //   if ( value !== nextValue ) 
-  //     category.getCategory({ level: nextValue.length });
-  // }
-
-  loadData = (selectedOptions) => {
-    const { category } = this.props;
-    category.getCategory({ level: selectedOptions.length + 1 });
-  }
-
-  render(){
-    const { category, ...rest } = this.props;
-    return <Cascader {...rest} loadData={this.loadData} changeOnSelect 
-      options={category.categoriesTree} />;
-  }
-};
-
 @inject('productEdit', 'category')
 @observer
 class CreateProduct extends Component {
-  componentWillMount(){
-    const { productEdit: product, match: { params: { id } } } = this.props;
-    product.setId(id);
-  }
-
   componentDidMount(){
-    const { productEdit: product, category, form } = this.props;
-    Promise.all([
-      category.getCategory({ level: 1 }),
-      product.getProduct()
-    ]).then(([categories, productInfo]) => {
-      const { cids } = productInfo;
-      Promise.all([
-        category.getCategory({ level: cids.length }),
-        product.getAttributes()
-      ]).then(res => {
-        form.setFieldsValue(product.pageValues);
+    const { productEdit: product, category, form, match: { params: { id } } } = this.props;
+
+    if ( id )
+      product.getProduct(id).then(res => {
+        if ( !res ) return;
+        const { cids } = product;
+
+        Promise.all([
+          category.getCategoryByLevels(cids),
+          product.getAttributes(cids[cids.length - 1])
+        ]).then(res => {
+          if ( !res ) return;
+          form.setFieldsValue(product.pageValues);
+        })
       })
-    });
+    else
+      category.getCategory({ level: 1 });
   }
 
   // 分类属性变更
-  handleCategoryChange = value => {
-    const len = value.length;
-    if ( len == 2 ) this.loadAttributes(value[len - 1]);
+  handleCategoryChange = cids => {
+    const { productEdit: product } = this.props;
+    if ( cids.length == 2 ) product.getAttributes(cids[cids.length - 1]);
   }
 
   // 提交数据
@@ -80,13 +54,12 @@ class CreateProduct extends Component {
       });
 
       // 将数据存入 store，准备提交
-      product.set({
+      product.setValues({
         ...rest,
         attrValues: attrValues
       });
 
-      if ( id !== undefined ) product.saveProduct();
-      else product.updateProduct(id);
+      product.saveProduct();
     })
   }
 
@@ -96,78 +69,61 @@ class CreateProduct extends Component {
 
     return (
       <Collapse defaultActiveKey={['1']}>
-        <Panel header={product.id ? `编辑商品 id:${product.id}` : '创建商品'} key="1">
+        <Panel header={product.id ? `${$i18n('action.edit')}${$i18n('text.product')} id:${product.id}` 
+          : `${$i18n('action.edit')}${$i18n('text.product')}`} key="1">
           <Form>
-            <FormItem {...formItemLayout} label="商品名称">
+            <FormItem {...formItemLayout} label={$i18n('model.product.name')}>
               {getFieldDecorator('name', {
-                rules: [{ required: true, message: '请输入商品名称！' }],
+                rules: [{ required: true, message: `${$i18n('text.please_input')}${$i18n('model.product.name')}` }],
               })(
-                <Input placeholder="请输入商品名称" />
+                <Input placeholder={`${$i18n('text.please_input')}${$i18n('model.product.name')}`} />
               )}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="商品分类">
+            <FormItem {...formItemLayout} label={$i18n('model.product.categories')}>
               {getFieldDecorator('cids', {
-                rules: [{ required: true, message: '请选择商品分类！' }],
+                rules: [{ required: true, message: `${$i18n('text.please_input')}${$i18n('model.product.categories')}` }],
               })(
-                <CategoryCascader placeholder="请选择商品分类" onChange={this.handleCategoryChange} />
+                <CategoryCascader placeholder={`${$i18n('text.please_input')}${$i18n('model.product.categories')}`} onChange={this.handleCategoryChange} />
               )}
             </FormItem>
 
-            {
-              product.attribute.attributes.map(attr => {
-                return (
-                  <FormItem {...formItemLayout} label={attr.name} key={attr.id}>
-                    {getFieldDecorator(`attrs.attrId${attr.id}`, {
-                      rules: [{ required: true, message: `请选择${attr.name}！` }],
-                    })(
-                      <Select mode="multiple" placeholder={`请选择${attr.name}！`}>
-                        {
-                          attr.values.map(item => {
-                            return <Option key={item.id} value={item.id}>{item.name}</Option>
-                          })
-                        }
-                      </Select>
-                    )}
-                  </FormItem>
-                )
-              })
-            }
+            <Attributes attributes={product.attributes} formItemLayout={formItemLayout} form={form} />
 
-            <FormItem {...formItemLayout} label="商品单价">
+            <FormItem {...formItemLayout} label={$i18n('model.product.price')}>
               {getFieldDecorator('price', {
                 rules: [{ 
-                  required: true, message: '请输入商品单价！' 
+                  required: true, message: `${$i18n('text.please_input')}${$i18n('model.product.price')}`
                 }, { 
-                  pattern: /^([1-9](\d+)?|0)(\.\d{1,2})?$/, message: '请输入两位小数！'
+                  pattern: /^([1-9](\d+)?|0)(\.\d{1,2})?$/, message: $i18n('text.should_be_two_decimals')
                 }],
               })(
-                <Input placeholder="请输入商品单价" />
+                <Input placeholder={`${$i18n('text.please_input')}${$i18n('model.product.price')}`} />
               )}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="商品数量">
+            <FormItem {...formItemLayout} label={$i18n('model.product.num')}>
               {getFieldDecorator('num', {
                 rules: [{ 
-                  required: true, message: '请输入商品数量！' 
+                  required: true, message: `${$i18n('text.please_input')}${$i18n('model.product.num')}` 
                 }, { 
-                  pattern: /^[1-9](\d+)?|0$/, message: '请输入两位整数！'
+                  pattern: /^[1-9](\d+)?|0$/, message: $i18n('text.should_be_integer')
                 }],
               })(
-                <Input placeholder="请输入商品数量" />
+                <Input placeholder={`${$i18n('text.please_input')}${$i18n('model.product.num')}`} />
               )}
             </FormItem>
 
-            <FormItem {...formItemLayout} label="商品描述">
+            <FormItem {...formItemLayout} label={$i18n('model.product.desc')}>
               {getFieldDecorator('desc', {
-                rules: [{ required: true, message: '请输入商品描述！' }],
+                rules: [{ required: true, message: `${$i18n('text.please_input')}${$i18n('model.product.desc')}` }],
               })(
-                <Input type='textarea' placeholder="请输入商品描述" />
+                <Input type='textarea' placeholder={`${$i18n('text.please_input')}${$i18n('model.product.desc')}`} />
               )}
             </FormItem>
             <FormItem {...tailFormItemLayout}>
               <Button type="primary" htmlType="submit" onClick={this.onSubmit}>
-                提交
+                {$i18n('action.submit')}
               </Button>
             </FormItem>
           </Form>
